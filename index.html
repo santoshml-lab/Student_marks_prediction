@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CrediLens AI | Loan Intelligence Platform</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    body{
+      margin:0;
+      font-family:Inter;
+      background:#070b14;
+      color:white;
+      display:flex;
+    }
+
+    /* SIDEBAR */
+    .sidebar{
+      width:280px;
+      background:#0b1220;
+      padding:20px;
+      border-right:1px solid rgba(255,255,255,0.08);
+    }
+
+    .logo{
+      font-size:20px;
+      font-weight:700;
+      margin-bottom:30px;
+      color:#60a5fa;
+    }
+
+    .nav{
+      padding:10px;
+      margin:10px 0;
+      border-radius:10px;
+      background:rgba(255,255,255,0.03);
+      cursor:pointer;
+    }
+
+    /* MAIN */
+    .main{
+      flex:1;
+      padding:25px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
+    }
+
+    .title{
+      font-size:22px;
+      font-weight:700;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:15px;
+      margin-bottom:20px;
+    }
+
+    .card{
+      background:rgba(255,255,255,0.05);
+      padding:15px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,0.08);
+    }
+
+    .big{
+      font-size:28px;
+      font-weight:700;
+    }
+
+    /* FORM */
+    input{
+      width:100%;
+      padding:10px;
+      margin:6px 0;
+      border-radius:8px;
+      border:none;
+      background:rgba(255,255,255,0.06);
+      color:white;
+      outline:none;
+    }
+
+    button{
+      width:100%;
+      padding:12px;
+      border:none;
+      border-radius:10px;
+      font-weight:700;
+      background:linear-gradient(90deg,#3b82f6,#22c55e);
+      color:white;
+      cursor:pointer;
+      margin-top:10px;
+    }
+
+    /* RESULT */
+    .result{
+      margin-top:15px;
+      padding:15px;
+      border-radius:12px;
+      font-weight:700;
+    }
+
+    .approved{ background:rgba(34,197,94,0.15); border:1px solid #22c55e;}
+    .rejected{ background:rgba(239,68,68,0.15); border:1px solid #ef4444;}
+
+    /* RISK BAR */
+    .bar{
+      height:10px;
+      background:#111827;
+      border-radius:20px;
+      overflow:hidden;
+      margin-top:10px;
+    }
+
+    .fill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,#ef4444,#22c55e);
+      transition:0.5s;
+    }
+
+    .section{
+      display:grid;
+      grid-template-columns:1.2fr 1fr;
+      gap:15px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">💳 CrediLens AI</div>
+
+  <div class="nav">📊 Dashboard</div>
+  <div class="nav">🧠 Risk Engine</div>
+  <div class="nav">📁 Portfolio</div>
+  <div class="nav">⚙️ API Logs</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="topbar">
+    <div class="title">Loan Underwriting Intelligence System</div>
+  </div>
+
+  <!-- KPI -->
+  <div class="grid">
+    <div class="card">
+      <div>Approval Rate</div>
+      <div class="big">92%</div>
+    </div>
+
+    <div class="card">
+      <div>Risk Avg</div>
+      <div class="big">Low</div>
+    </div>
+
+    <div class="card">
+      <div>Active Requests</div>
+      <div class="big">1,284</div>
+    </div>
+  </div>
+
+  <div class="section">
+
+    <!-- FORM -->
+    <div class="card">
+      <h3>Applicant Analysis</h3>
+
+      <input id="cibil" placeholder="CIBIL Score">
+      <input id="income" placeholder="Annual Income">
+      <input id="loan_amount" placeholder="Loan Amount">
+      <input id="loan_term" placeholder="Loan Term">
+      <input id="education" placeholder="Education">
+      <input id="self_employed" placeholder="Self Employed">
+      <input id="dependents" placeholder="Dependents">
+
+      <button onclick="predict()">Run AI Risk Engine 🚀</button>
+
+      <div id="result" class="result"></div>
+
+      <div class="bar">
+        <div id="fill" class="fill"></div>
+      </div>
+
+    </div>
+
+    <!-- INSIGHTS -->
+    <div class="card">
+      <h3>AI Explanation Layer</h3>
+      <div id="reason">Waiting for prediction...</div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+async function predict(){
+
+  const data = {
+    cibil_score: Number(cibil.value),
+    income_annum: Number(income.value),
+    loan_amount: Number(loan_amount.value),
+    loan_term: Number(loan_term.value),
+    education: education.value,
+    self_employed: self_employed.value,
+    no_of_dependents: Number(dependents.value),
+    residential_assets_value: 0,
+    commercial_assets_value: 0,
+    luxury_assets_value: 0,
+    bank_asset_value: 0
+  };
+
+  const res = await fetch("https://loan-dashboard-akaa.onrender.com/predict",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(data)
+  });
+
+  const out = await res.json();
+
+  let box = document.getElementById("result");
+  let bar = document.getElementById("fill");
+  let reason = document.getElementById("reason");
+
+  if(out.result.includes("Approved")){
+    box.className="result approved";
+    box.innerHTML="APPROVED ✅";
+    bar.style.width="85%";
+    reason.innerHTML="High CIBIL + stable income → low default probability";
+  } else {
+    box.className="result rejected";
+    box.innerHTML="REJECTED ❌";
+    bar.style.width="30%";
+    reason.innerHTML="Low credit score or unstable profile → high risk flagged";
+  }
+}
+</script>
+
+</body>
+</html>
